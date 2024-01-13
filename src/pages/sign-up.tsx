@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -9,13 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { api } from '@/lib/axios'
 
-const signUpForm = z.object({
-  name: z.string(),
-  email: z.string().email(),
+const signUpFormSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email().min(1),
   password: z.string().min(6),
 })
 
-type SignUpForm = z.infer<typeof signUpForm>
+type SignUpForm = z.infer<typeof signUpFormSchema>
 
 export function SignUp() {
   const navigate = useNavigate()
@@ -24,7 +25,9 @@ export function SignUp() {
     register,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<SignUpForm>()
+  } = useForm<SignUpForm>({
+    resolver: zodResolver(signUpFormSchema),
+  })
 
   async function handleSignUp(data: SignUpForm) {
     console.log(data)
@@ -38,7 +41,7 @@ export function SignUp() {
         role: 'user',
       })
       .then(() => {
-        toast.success('Estabelecimento cadastrado com sucesso', {
+        toast.success('Usuário cadastrado com sucesso', {
           action: {
             label: 'Login',
             onClick: () => navigate('/sign-in'),
@@ -46,10 +49,22 @@ export function SignUp() {
         })
       })
       .catch((error) => {
-        console.log(error)
-        toast.error(
-          'Erro ao cadastrar estabelecimento. ' + error.response.data.error,
-        )
+        if (error.response) {
+          const { status, data: responseData } = error.response
+
+          if (
+            status === 409 &&
+            responseData.message === 'E-mail already exists'
+          ) {
+            toast.error(
+              'E-mail já cadastrado. Por favor, escolha outro ou faça login.',
+            )
+          } else {
+            toast.error('Ops... Ocorreu um erro! Tente novamente mais tarde.')
+          }
+        } else {
+          toast.error('Ops... Ocorreu um erro! Tente novamente mais tarde.')
+        }
       })
   }
 
@@ -77,12 +92,17 @@ export function SignUp() {
             >
               <div className="space-y-2">
                 <Label htmlFor="name">Nome</Label>
-                <Input id="name" type="text" {...register('name')} />
+                <Input id="name" type="text" {...register('name')} required />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email">E-mail</Label>
-                <Input id="email" type="email" {...register('email')} />
+                <Input
+                  id="email"
+                  type="email"
+                  {...register('email')}
+                  required
+                />
               </div>
 
               <div className="space-y-2">
@@ -91,6 +111,8 @@ export function SignUp() {
                   id="password"
                   type="password"
                   {...register('password')}
+                  minLength={6}
+                  required
                 />
               </div>
 

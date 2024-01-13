@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -16,6 +16,7 @@ const signInForm = z.object({
 type SignInForm = z.infer<typeof signInForm>
 
 export function SignIn() {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -31,15 +32,10 @@ export function SignIn() {
         password,
       })
       .then(() => {
-        toast.success('Enviamos um link de autenticação para seu e-mail.', {
-          action: {
-            label: 'Reenviar',
-            onClick: () => handleSignIn(data),
-          },
-        })
+        navigate('/')
       })
-      .catch((error) => {
-        toast.error('Credenciais inválidas. ' + error.response.data.error)
+      .catch(() => {
+        toast.error('Credenciais inválidas.')
       })
   }
 
@@ -48,7 +44,7 @@ export function SignIn() {
       <div className="p-8">
         <Button variant="ghost" asChild className="absolute right-8 top-8">
           <Link to="/sign-up" className="">
-            Novo estabelecimento
+            Criar nova conta
           </Link>
         </Button>
         <div className="flex w-[350px] flex-col justify-center gap-6">
