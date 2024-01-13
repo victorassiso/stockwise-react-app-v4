@@ -4,10 +4,10 @@ import { toast } from 'sonner'
 // import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { createUser } from '@/api/users/create-user'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { api } from '@/lib/axios'
 
 const signUpForm = z.object({
   name: z.string(),
@@ -28,8 +28,15 @@ export function SignUp() {
 
   async function handleSignUp(data: SignUpForm) {
     console.log(data)
+    const { name, email, password } = data
 
-    createUser(data)
+    await api
+      .post('/users', {
+        name,
+        email,
+        password,
+        role: 'user',
+      })
       .then(() => {
         toast.success('Estabelecimento cadastrado com sucesso', {
           action: {
@@ -40,7 +47,9 @@ export function SignUp() {
       })
       .catch((error) => {
         console.log(error)
-        toast.error('Erro ao cadastrar estabelecimento.')
+        toast.error(
+          'Erro ao cadastrar estabelecimento. ' + error.response.data.error,
+        )
       })
   }
 
