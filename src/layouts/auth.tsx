@@ -1,8 +1,6 @@
 import { Package } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
 
-import boxImg from '@/assets/box.svg'
-
 export function AuthLayout() {
   return (
     <div className="grid min-h-screen grid-cols-2 antialiased">
