@@ -1,12 +1,13 @@
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 // import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { createUser } from '@/api/users/create-user'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { api } from '@/lib/axios'
 
 const signUpForm = z.object({
   name: z.string(),
@@ -17,7 +18,7 @@ const signUpForm = z.object({
 type SignUpForm = z.infer<typeof signUpForm>
 
 export function SignUp() {
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
 
   const {
     register,
@@ -28,19 +29,18 @@ export function SignUp() {
   async function handleSignUp(data: SignUpForm) {
     console.log(data)
 
-    const { name, email, password } = data
-    api
-      .post('/users', {
-        name,
-        email,
-        password,
-        role: 'user',
-      })
-      .then((response) => {
-        console.log(response)
+    createUser(data)
+      .then(() => {
+        toast.success('Estabelecimento cadastrado com sucesso', {
+          action: {
+            label: 'Login',
+            onClick: () => navigate('/sign-in'),
+          },
+        })
       })
       .catch((error) => {
         console.log(error)
+        toast.error('Erro ao cadastrar estabelecimento.')
       })
   }
 
