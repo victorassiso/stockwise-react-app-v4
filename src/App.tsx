@@ -1,9 +1,9 @@
 import './global.css'
 
+import { RouterProvider } from 'react-router-dom'
+
+import { router } from './routes'
+
 export function App() {
-  return (
-    <div>
-      <h1 className="text-4xl text-green-500">App</h1>
-    </div>
-  )
+  return <RouterProvider router={router} />
 }
