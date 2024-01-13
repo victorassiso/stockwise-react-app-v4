@@ -1,0 +1,1 @@
+# StockWise React App
