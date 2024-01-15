@@ -27,7 +27,7 @@ export function SignIn() {
     const { email, password } = data
 
     api
-      .post('/users/auth', {
+      .post('/sessions', {
         email,
         password,
       })
